@@ -9,12 +9,12 @@ from MANN.Utils.Images import get_shuffled_images, load_transform
 class OmniglotGenerator(object):
     """Docstring for OmniglotGenerator"""
 
-    def __init__(self, data_folder, batch_size=1, nb_samples=5, nb_samples_per_class=10, max_rotation=-np.pi / 6,
+    def __init__(self, data_folder, batch_size=1, nb_classes=5, nb_samples_per_class=10, max_rotation=-np.pi / 6,
                  max_shift=10, img_size=(20, 20), max_iter=None):
         super(OmniglotGenerator, self).__init__()
         self.data_folder = data_folder
         self.batch_size = batch_size
-        self.nb_samples = nb_samples
+        self.nb_classes = nb_classes
         self.nb_samples_per_class = nb_samples_per_class
         self.max_rotation = max_rotation
         self.max_shift = max_shift
@@ -35,7 +35,7 @@ class OmniglotGenerator(object):
     def next(self):
         if (self.max_iter is None) or (self.num_iter < self.max_iter):
             self.num_iter += 1
-            return (self.num_iter - 1), self.sample(self.nb_samples)
+            return (self.num_iter - 1), self.sample(self.nb_classes)
         else:
             raise StopIteration
 

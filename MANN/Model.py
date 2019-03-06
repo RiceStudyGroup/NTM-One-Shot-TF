@@ -12,13 +12,19 @@ def memory_augmented_neural_network(input_var, target_var, \
                                     controller_size=200, input_size=20 * 20, nb_reads=4):
     ## input_var has dimensions (batch_size, time, 	input_dim)
     ## target_var has dimensions (batch_size, time) (label indices)
-
-    M_0 = shared_float32(1e-6 * np.ones((batch_size,) + memory_shape), name='memory')
+    # (batch_size,) + memory_shape becomes (16, 128, 40), and then initialize it as a numpy array, and then convert it as a tf tensor
+    M_0 = shared_float32(1e-6 * np.ones((batch_size,) + memory_shape),
+                         name='memory')  # todo why memory's shape will be influenced by the batch_size?
     c_0 = shared_float32(np.zeros((batch_size, controller_size)), name='memory_cell_state')
     h_0 = shared_float32(np.zeros((batch_size, controller_size)), name='hidden_state')
-    r_0 = shared_float32(np.zeros((batch_size, nb_reads * memory_shape[1])), name='read_vector')
-    wr_0 = shared_one_hot((batch_size, nb_reads, memory_shape[0]), name='wr')
-    wu_0 = shared_one_hot((batch_size, memory_shape[0]), name='wu')
+    r_0 = shared_float32(np.zeros((batch_size, nb_reads * memory_shape[1])),
+                         name='read_vector')  # does this mean each time we will read 4 piece of memory?
+    wr_0 = shared_one_hot((batch_size, nb_reads, memory_shape[0]),
+                          name='wr')  # todo why these are one hot, rather than float numbers?
+    wu_0 = shared_one_hot((batch_size, memory_shape[0]),
+                          name='wu')  # i have to say his code is so stupid, the dtype is actually float32 even he named then one hot
+
+    # and the first number are all 0, the shape is
 
     def shape_high(shape):
         shape = np.array(shape)
@@ -29,7 +35,7 @@ def memory_augmented_neural_network(input_var, target_var, \
         return (list(shape), high)
 
     with tf.variable_scope("Weights"):
-        shape, high = shape_high((nb_reads, controller_size, memory_shape[1]))
+        shape, high = shape_high((nb_reads, controller_size, memory_shape[1]))  # todo what does high mean here? 
         W_key = tf.get_variable('W_key', shape=shape, initializer=tf.random_uniform_initializer(-1 * high, high))
         b_key = tf.get_variable('b_key', shape=(nb_reads, memory_shape[1]), initializer=tf.constant_initializer(0))
         shape, high = shape_high((nb_reads, controller_size, memory_shape[1]))

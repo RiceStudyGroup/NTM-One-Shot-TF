@@ -17,28 +17,39 @@ tf.reset_default_graph()
 def omniglot():
     sess = tf.InteractiveSession()
 
-    input_ph = tf.placeholder(dtype=tf.float32, shape=(16, 50, 400))  # (batch_size, time, input_dim)
-    target_ph = tf.placeholder(dtype=tf.int32, shape=(16, 50))  # (batch_size, time)(label_indices)
-
     ##Global variables for Omniglot Problem
-    nb_reads = 4
-    controller_size = 200
+    nb_reads = 4  # todo what does nb mean here? number, then what does read mean here?
+    # finally get it, 4 means from a 128*40 external memory, you will read 4 * 40
+    controller_size = 200  # todo what does the size of controller mean, the length of k?
     memory_shape = (128, 40)
-    nb_class = 5
+    nb_class = 5  # each task will deal with 5 classes of samples
     input_size = 20 * 20
     batch_size = 16
-    nb_samples_per_class = 10
+    nb_samples_per_class = 10  # each class will have 10 samples
+
+    input_ph = tf.placeholder(dtype=tf.float32, shape=(batch_size, 50, 400))  # (batch_size, time, input_dim)
+    # todo why 400, does he flatten the input image? or he use some neural network to embed each image as a 400 vector?
+    target_ph = tf.placeholder(dtype=tf.int32, shape=(batch_size, 50))  # (batch_size, time)(label_indices)
+    # todo what does time mean here?
 
     # Load Data
-    generator = OmniglotGenerator(data_folder='./data/omniglot/images_background', batch_size=batch_size,
-                                  nb_samples=nb_class,
-                                  nb_samples_per_class=nb_samples_per_class, max_rotation=0., max_shift=0.,
+    generator = OmniglotGenerator(data_folder='./data/omniglot/images_background',
+                                  batch_size=batch_size,  # 16
+                                  nb_classes=nb_class,  # 5 classes
+                                  nb_samples_per_class=nb_samples_per_class,  # 10 samples per class
+                                  max_rotation=0.,
+                                  max_shift=0.,
                                   max_iter=None)
-    output_var, output_var_flatten, params = memory_augmented_neural_network(input_ph, target_ph, batch_size=batch_size,
+
+    output_var, output_var_flatten, params = memory_augmented_neural_network(input_ph,
+                                                                             target_ph,
+                                                                             batch_size=batch_size,
                                                                              nb_class=nb_class,
                                                                              memory_shape=memory_shape,
+                                                                             # 128 by 40, so 128 rows?
                                                                              controller_size=controller_size,
-                                                                             input_size=input_size, nb_reads=nb_reads)
+                                                                             input_size=input_size,  # 400 here
+                                                                             nb_reads=nb_reads)  # 4 here, what does reads mean?
 
     print('Compiling the Model')
 
@@ -60,7 +71,7 @@ def omniglot():
     params = [W_key, b_key, W_add, b_add, W_sigma, b_sigma, W_xh, W_rh, W_hh, b_h, W_o, b_o]
 
     # output_var = tf.cast(output_var, tf.int32)
-    target_ph_oh = tf.one_hot(target_ph, depth=generator.nb_samples)
+    target_ph_oh = tf.one_hot(target_ph, depth=generator.nb_classes)
     print('Output, Target shapes: ', output_var.get_shape().as_list(), target_ph_oh.get_shape().as_list())
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits=output_var, labels=target_ph_oh), name="cost")
     opt = tf.train.AdamOptimizer(learning_rate=1e-3)
@@ -69,7 +80,7 @@ def omniglot():
     # train_step = tf.train.AdamOptimizer(1e-3).minimize(cost)
     accuracies = accuracy_instance(tf.argmax(output_var, axis=2), target_ph, batch_size=generator.batch_size)
     sum_out = tf.reduce_sum(
-        tf.reshape(tf.one_hot(tf.argmax(output_var, axis=2), depth=generator.nb_samples), (-1, generator.nb_samples)),
+        tf.reshape(tf.one_hot(tf.argmax(output_var, axis=2), depth=generator.nb_classes), (-1, generator.nb_classes)),
         axis=0)
 
     print('Done')
@@ -80,7 +91,7 @@ def omniglot():
 
     merged = tf.summary.merge_all()
     # writer = tf.summary.FileWriter('/tmp/tensorflow', graph=tf.get_default_graph())
-    train_writer = tf.summary.FileWriter('/tmp/tensorflow/', sess.graph)
+    train_writer = tf.summary.FileWriter('./logs/', sess.graph)
 
     t0 = time.time()
     all_scores, scores, accs = [], [], np.zeros(generator.nb_samples_per_class)
