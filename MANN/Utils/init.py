@@ -1,7 +1,5 @@
-import tensorflow
-import tensorflow as tf
 import numpy as np
-import sys
+import tensorflow as tf
 
 
 def shared_glorot_uniform(shape, dtype=tf.float32, name='', n=None):

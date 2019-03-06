@@ -1,10 +1,9 @@
-import tensorflow as tf
-import numpy as np
-import pytest
-
 import os
 import random
-from MANN.Utils.Images import get_shuffled_images, time_offset_label, load_transform
+
+import numpy as np
+
+from MANN.Utils.Images import get_shuffled_images, load_transform
 
 
 class OmniglotGenerator(object):

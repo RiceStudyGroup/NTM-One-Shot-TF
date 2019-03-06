@@ -1,20 +1,6 @@
 # One Shot Learning using Memory-Augmented Neural Networks in Tensorflow. 
 
-Update: added support for Tensorflow v1*.
-
-Tensorflow implementation of the paper *One-shot Learning with Memory-Augmented Neural Networks*. 
-
-Current Progress of Implementation:
-- [x]  Utility Functions:
-  - [x] Image Handler
-  - [x] Metrics (Accuracy)
-  - [x] Similarities (Cosine Similarity)
-- [x] LSTM Controller and Memory Unit
-- [x] Batch Generators
-- [x] Omniglot Tester Code
-- [ ] Unsupervised Feature Learning through Autoencoders
-- [ ] Cattle/New Born Recognition
-
-The benchmark dataset is [Omniglot dataset](https://github.com/brendenlake/omniglot). All the datasets should be placed in the [`data/`](data/) folder.
+1. cd to data/omniglot and unzip the zip to that directory
+2. python Omniglot.py
 
 Adam Santoro, Sergey Bartunov, Matthew Botvinick, Daan Wierstra, Timothy Lillicrap, *One-shot Learning with Memory-Augmented Neural Networks*, [[arXiv](http://arxiv.org/abs/1605.06065)]

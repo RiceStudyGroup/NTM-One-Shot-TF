@@ -9,7 +9,9 @@ import time
 from MANN.Model import memory_augmented_neural_network
 from MANN.Utils.Generator import OmniglotGenerator
 from MANN.Utils.Metrics import accuracy_instance
-from MANN.Utils.tf_utils import update_tensor
+from tqdm import tqdm
+
+tf.reset_default_graph()
 
 
 def omniglot():
@@ -88,7 +90,7 @@ def omniglot():
     print('Training the model')
 
     try:
-        for i, (batch_input, batch_output) in generator:
+        for i, (batch_input, batch_output) in tqdm(generator):
             feed_dict = {
                 input_ph: batch_input,
                 target_ph: batch_output
@@ -100,11 +102,11 @@ def omniglot():
             temp = sum_out.eval(feed_dict)
             summary = merged.eval(feed_dict)
             train_writer.add_summary(summary, i)
-            print(i, ' ', temp)
+            # print(i, ' ', temp)
             all_scores.append(score)
             scores.append(score)
             accs += acc
-            if i > 0 and not (i % 100):
+            if i > 0 and not (i % 10):
                 print(accs / 100.0)
                 print('Episode %05d: %.6f' % (i, np.mean(score)))
                 scores, accs = [], np.zeros(generator.nb_samples_per_class)

@@ -1,7 +1,7 @@
-import tensorflow as tf
 import numpy as np
+import tensorflow as tf
 
-from .Utils.init import weight_and_bias_init, shared_glorot_uniform, shared_one_hot
+from .Utils.init import shared_one_hot
 from .Utils.similarities import cosine_similarity
 from .Utils.tf_utils import shared_float32
 from .Utils.tf_utils import update_tensor

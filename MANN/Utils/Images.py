@@ -1,12 +1,9 @@
-import tensorflow as tf
-import numpy as np
-import scipy.misc
-import matplotlib.pyplot as plt
 import os
 import random
 
-from scipy.ndimage import rotate, shift
+import numpy as np
 from scipy.misc import imread, imresize
+from scipy.ndimage import rotate, shift
 
 
 def get_shuffled_images(paths, labels, nb_samples=None):
